@@ -15,16 +15,12 @@ export class CharacterGetterElement extends LitElement {
     return Math.ceil(Math.random() * 100)  
   }
 
-  connectedCallback () {
-  setInterval(() => {
+  getNewCharacter() {
     fetch(`https://rickandmortyapi.com/api/character/${this.newRandomInt()}`)
-    .then(response => Response.json())
-    .then(jsonData => this.dispatchEvent(new CustomEvent('new-character-event', { detail: jsonData })))
+    .then(response => response.json())
+    .then(characterData => this.dispatchEvent(new CustomEvent('new-character-event', { detail: characterData })))
     
-  }, 10000)
-
   }
-
 
    static get styles() {
     return css`
