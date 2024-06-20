@@ -1,12 +1,12 @@
 import { LitElement, css, html } from 'lit'
 import { Child1Element } from './child-1-element'
 import { CharacterGetterElement } from './character-getter-element'
+import { CharacterCardElement } from './character-card-element'
 /**
  * An example element.
  *
- * @slot - This element has a slot
- * @csspart h1 - The h1
- */
+/** */
+
 export class MyElement extends LitElement {
   static get properties() {
     return {
@@ -14,6 +14,10 @@ export class MyElement extends LitElement {
        * the number of times h1 has been clicked.
        */
       count: { type: Number },
+      /**
+       * An array of characters
+       */
+      characters: { type: Array }
 
 
     }
@@ -21,25 +25,29 @@ export class MyElement extends LitElement {
 
   constructor() {
     super()
-
     this.count = 0
+    this.characters = []
   }
 
   myEvent1Handler() {
     this.count++
   }
 
-  newCharacterEventHandler(e) {
-    const character = e.detail
-    const characterName = character.name
-    const characterImg = character.image
-    const characterSpecies = character.species
-    const characterStatus = character.status
 
-    this.shadowRoot.querySelector("#character-name").innerHTML = characterName
-    this.shadowRoot.querySelector("#character-img").src = characterImg
-    this.shadowRoot.querySelector("#character-species").innerHTML = characterSpecies
-    this.shadowRoot.querySelector("#character-status").innerHTML = characterStatus
+  firstUpdated() {
+    const getter = this.shadowRoot.querySelector("#getter") 
+    
+     for (let i = 0; i < 100; i++) 
+      getter.getNewCharacter()
+    
+      }
+    
+
+
+
+  newCharacterEventHandler(e) {
+   this.characters = [... this.characters, e.detail]
+    
   }
 
   render() {
@@ -50,14 +58,12 @@ export class MyElement extends LitElement {
         count is ${this.count}
       </h1>
       <child-1-element @my-event-1="${this.myEvent1Handler}"></child-1-element>
-      <character-getter-element @new-character-event="${this.newCharacterEventHandler}"></character-getter-element>
-      <h1 id="character-name"></h1>
-      <img id="character-img">
-      <h3 id="character-species"></h3>
-      <h3 id="character-status"> </h3>
-    </div>
-    `
-
+      <character-getter-element id="getter" @new-character-event="${this.newCharacterEventHandler}"></character-getter-element>
+      <div class="character-table">
+       ${this.characters.map(character => html`<character-card-element class="character-item" name="${character.name}"  image="${character.image}" species="${character.species}" status="${character.status}"></character-card-element>`)}    
+     </div> 
+     </div>
+    ` 
   }
 
   static get styles() {
@@ -83,6 +89,7 @@ export class MyElement extends LitElement {
       }
 
       .card {
+        background-color: #323232;
         padding: 2em;
       }
 
@@ -137,12 +144,22 @@ export class MyElement extends LitElement {
       img{
         width:50vw;
       }
+      .character-table {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        padding-right: 10px;
+        
+        
+
+
+        .character-item {
+          font-size: 30px;
+          text-align: center;
+        }
+      }
     `
-  }
-}
+      }
+      }
+
 
 window.customElements.define('my-element', MyElement)
-
-
-
-
